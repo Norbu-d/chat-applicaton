@@ -1,13 +1,14 @@
 import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import cors from "cors"; // Import cors
 import authRoutes from "./routes/authroutes.js";
 import connectdb from "./db/connectdb.js";
 import messageRoutes from "./routes/messageroutes.js";
 import userRoutes from "./routes/userroutes.js";
+import { app, server } from "./socket/socket.js";
 
 dotenv.config();
-const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Middleware to parse JSON bodies
@@ -27,7 +28,7 @@ app.use("/api/users", userRoutes);
 
 connectdb()
   .then(() => {
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
   })

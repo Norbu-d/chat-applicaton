@@ -1,0 +1,6 @@
+.app-background {
+  background-image: url('../public/background.jpg'); /* Adjust path if needed */
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh; /* Ensure the background covers the whole viewport height */
+}
