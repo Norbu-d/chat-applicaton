@@ -1,14 +1,14 @@
-# Use Node.js 18 Alpine for smaller image size
-FROM node:18-alpine
+# Use Node.js 20 Alpine (consistent with frontend)
+FROM node:20-alpine
 
 # Set working directory inside container
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Copy package.json (package-lock.json is optional)
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install dependencies (use npm install instead of npm ci)
+RUN npm install
 
 # Copy application code
 COPY . .
