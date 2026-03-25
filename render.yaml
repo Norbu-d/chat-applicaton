@@ -4,7 +4,7 @@ services:
     ipAllowList: []  # only accessible from other services
   - type: web
     name: backend
-    dockerfilePath: ./backend/Dockerfile
+    dockerfilePath: Dockerfile
     source: ./backend
     envVars:
       - key: DB_HOST
@@ -36,7 +36,7 @@ services:
         value: 5000
   - type: web
     name: frontend
-    dockerfilePath: ./frontend/Dockerfile
+    dockerfilePath: Dockerfile
     source: ./frontend
   - type: web
     name: be-todo
