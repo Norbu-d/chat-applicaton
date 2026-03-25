@@ -6,28 +6,7 @@ services:
   - type: web
     name: be-todo
     dockerfilePath: ./backend/Dockerfile
-    source: ./backend
-    envVars:
-      - key: DB_HOST
-        fromService:
-          type: pserv
-          name: todo-db
-          property: host
-      - key: DB_USER
-        value: postgres
-      - key: DB_PASSWORD
-        fromService:
-          type: pserv
-          name: todo-db
-          property: password
-      - key: DB_NAME
-        value: todo_db
-      - key: DB_PORT
-        value: 5432
-      - key: PORT
-        value: 5000
 
   - type: web
     name: fe-todo
     dockerfilePath: ./frontend/Dockerfile
-    source: ./frontend
