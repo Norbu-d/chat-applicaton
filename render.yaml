@@ -1,12 +1,13 @@
 services:
   - type: pserv
     name: todo-db
-    ipAllowList: []
 
   - type: web
     name: be-todo
+    runtime: docker
     dockerfilePath: ./backend/Dockerfile
 
   - type: web
     name: fe-todo
+    runtime: docker
     dockerfilePath: ./frontend/Dockerfile
