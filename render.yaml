@@ -1,4 +1,43 @@
 services:
+  - type: pserv
+    name: todo-db
+    ipAllowList: []  # only accessible from other services
+  - type: web
+    name: backend
+    dockerfilePath: ./backend/Dockerfile
+    source: ./backend
+    envVars:
+      - key: DB_HOST
+        fromService:
+          type: pserv
+          name: todo-db
+          property: host
+      - key: DB_USER
+        fromService:
+          type: pserv
+          name: todo-db
+          property: user
+      - key: DB_PASSWORD
+        fromService:
+          type: pserv
+          name: todo-db
+          property: password
+      - key: DB_NAME
+        fromService:
+          type: pserv
+          name: todo-db
+          property: database
+      - key: DB_PORT
+        fromService:
+          type: pserv
+          name: todo-db
+          property: port
+      - key: PORT
+        value: 5000
+  - type: web
+    name: frontend
+    dockerfilePath: ./frontend/Dockerfile
+    source: ./frontend
   - type: web
     name: be-todo
     env: docker

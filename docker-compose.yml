@@ -20,7 +20,9 @@ services:
       retries: 5
 
   backend:
-    image: norbu07/be-todo:02230293
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     environment:
       DB_HOST: postgres
       DB_USER: postgres
@@ -37,7 +39,9 @@ services:
       - todo-network
 
   frontend:
-    image: norbu07/fe-todo:02230293
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     ports:
       - "80:80"
     depends_on:
@@ -47,6 +51,9 @@ services:
 
 volumes:
   postgres_data:
+
+networks:
+  todo-network:
 
 networks:
   todo-network:
