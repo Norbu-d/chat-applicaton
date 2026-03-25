@@ -2,7 +2,7 @@ services:
   - type: web
     name: be-todo
     env: docker
-    image: norbu07/be-todo:02230293
+    dockerfilePath: ./backend/Dockerfile
     region: oregon
     plan: free
     envVars:
@@ -28,7 +28,7 @@ services:
   - type: web
     name: fe-todo
     env: docker
-    image: norbu07/fe-todo:02230293
+    dockerfilePath: ./frontend/Dockerfile
     region: oregon
     plan: free
     envVars:
