@@ -4,13 +4,13 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
+COPY frontend/package*.json ./
 
 # Install ALL dependencies (including dev dependencies)
 RUN npm install
 
 # Copy source code
-COPY . .
+COPY frontend/ ./
 
 # Build the application
 RUN npm run build
