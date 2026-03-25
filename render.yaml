@@ -1,8 +1,6 @@
 services:
   - type: pserv
     name: todo-db
-    databaseName: todo_db
-    user: todo_user
     ipAllowList: []
 
   - type: web
@@ -16,25 +14,16 @@ services:
           name: todo-db
           property: host
       - key: DB_USER
-        fromService:
-          type: pserv
-          name: todo-db
-          property: user
+        value: postgres
       - key: DB_PASSWORD
         fromService:
           type: pserv
           name: todo-db
           property: password
       - key: DB_NAME
-        fromService:
-          type: pserv
-          name: todo-db
-          property: database
+        value: todo_db
       - key: DB_PORT
-        fromService:
-          type: pserv
-          name: todo-db
-          property: port
+        value: 5432
       - key: PORT
         value: 5000
 
@@ -42,83 +31,3 @@ services:
     name: fe-todo
     dockerfilePath: ./frontend/Dockerfile
     source: ./frontend
-  - type: pserv
-    name: todo-db
-    ipAllowList: []  # only accessible from other services
-  - type: web
-    name: backend
-    dockerfilePath: ./backend/Dockerfile
-    source: ./backend
-    envVars:
-      - key: DB_HOST
-        fromService:
-          type: pserv
-          name: todo-db
-          property: host
-      - key: DB_USER
-        fromService:
-          type: pserv
-          name: todo-db
-          property: user
-      - key: DB_PASSWORD
-        fromService:
-          type: pserv
-          name: todo-db
-          property: password
-      - key: DB_NAME
-        fromService:
-          type: pserv
-          name: todo-db
-          property: database
-      - key: DB_PORT
-        fromService:
-          type: pserv
-          name: todo-db
-          property: port
-      - key: PORT
-        value: 5000
-  - type: web
-    name: frontend
-    dockerfilePath: ./frontend/Dockerfile
-    source: ./frontend
-  - type: web
-    name: be-todo
-    env: docker
-    dockerfilePath: ./backend/Dockerfile
-    region: oregon
-    plan: free
-    envVars:
-      - key: DB_HOST
-        fromDatabase:
-          name: todo-db
-          property: host
-      - key: DB_USER
-        fromDatabase:
-          name: todo-db
-          property: user
-      - key: DB_PASSWORD
-        fromDatabase:
-          name: todo-db
-          property: password
-      - key: DB_NAME
-        fromDatabase:
-          name: todo-db
-          property: database
-      - key: PORT
-        value: 5000
-
-  - type: web
-    name: fe-todo
-    env: docker
-    dockerfilePath: ./frontend/Dockerfile
-    region: oregon
-    plan: free
-    envVars:
-      - key: VITE_API_URL
-        value: https://be-todo.onrender.com
-
-databases:
-  - name: todo-db
-    databaseName: todo_db
-    user: todo_user
-    plan: free
