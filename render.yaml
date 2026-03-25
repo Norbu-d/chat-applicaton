@@ -17,6 +17,15 @@ services:
     name: fe-todo
     runtime: docker
     dockerfilePath: ./frontend/Dockerfile
+  - type: web
+    name: be-todo
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+
+  - type: web
+    name: fe-todo
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
   - type: pserv
     name: todo-db
 
