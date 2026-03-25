@@ -1,59 +1,44 @@
 services:
   - type: web
     name: be-todo
-    runtime: docker
+    env: docker
     dockerfilePath: ./backend/Dockerfile
+    region: oregon
+    plan: free
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: DB_HOST
+        fromDatabase:
+          name: todo-db
+          property: host
+      - key: DB_USER
+        fromDatabase:
+          name: todo-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: todo-db
+          property: password
+      - key: DB_NAME
+        fromDatabase:
+          name: todo-db
+          property: database
+      - key: DB_PORT
+        value: 5432
 
   - type: web
     name: fe-todo
-    runtime: docker
+    env: docker
     dockerfilePath: ./frontend/Dockerfile
+    region: oregon
+    plan: free
+    envVars:
+      - key: VITE_API_URL
+        value: https://be-todo.onrender.com
 
-  - type: web
-    name: be-todo
-    runtime: docker
-    dockerfilePath: ./backend/Dockerfile
-  - type: web
-    name: fe-todo
-    runtime: docker
-    dockerfilePath: ./frontend/Dockerfile
-
-  - type: web
-    name: be-todo
-    runtime: docker
-    dockerfilePath: ./backend/Dockerfile
-
-  - type: web
-    name: fe-todo
-    runtime: docker
-    dockerfilePath: ./frontend/Dockerfile
-  - type: web
-    name: be-todo
-    runtime: docker
-    dockerfilePath: ./backend/Dockerfile
-
-  - type: web
-    name: fe-todo
-    runtime: docker
-    dockerfilePath: ./frontend/Dockerfile
-  - type: web
-    name: be-todo
-    runtime: docker
-    dockerfilePath: ./backend/Dockerfile
-
-  - type: web
-    name: fe-todo
-    runtime: docker
-    dockerfilePath: ./frontend/Dockerfile
-  - type: pserv
-    name: todo-db
-
-  - type: web
-    name: be-todo
-    runtime: docker
-    dockerfilePath: ./backend/Dockerfile
-
-  - type: web
-    name: fe-todo
-    runtime: docker
-    dockerfilePath: ./frontend/Dockerfile
+databases:
+  - name: todo-db
+    databaseName: todo_db
+    user: todo_user
+    plan: free
