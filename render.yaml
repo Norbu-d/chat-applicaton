@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: be-todo
+    env: docker
+    image: norbu07/be-todo:02230293
+    region: oregon
+    plan: free
+    envVars:
+      - key: DB_HOST
+        fromDatabase:
+          name: todo-db
+          property: host
+      - key: DB_USER
+        fromDatabase:
+          name: todo-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: todo-db
+          property: password
+      - key: DB_NAME
+        fromDatabase:
+          name: todo-db
+          property: database
+      - key: PORT
+        value: 5000
+
+  - type: web
+    name: fe-todo
+    env: docker
+    image: norbu07/fe-todo:02230293
+    region: oregon
+    plan: free
+    envVars:
+      - key: VITE_API_URL
+        value: https://be-todo.onrender.com
+
+databases:
+  - name: todo-db
+    databaseName: todo_db
+    user: todo_user
+    plan: free
