@@ -17,6 +17,7 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD || 'postgres',
   database: process.env.DB_NAME || 'todo_db',
   port: process.env.DB_PORT || 5432,
+  ssl: process.env.DB_HOST !== 'localhost' ? { rejectUnauthorized: false } : false,
 });
 
 // Create tasks table if not exists
@@ -25,7 +26,6 @@ const createTable = async () => {
   try {
     console.log('Checking if tasks table exists...');
     
-    // Create table if it doesn't exist
     await client.query(`
       CREATE TABLE IF NOT EXISTS tasks (
         id SERIAL PRIMARY KEY,
@@ -38,7 +38,6 @@ const createTable = async () => {
     
     console.log('✅ Tasks table created or already exists');
     
-    // Check if table has data
     const result = await client.query('SELECT COUNT(*) FROM tasks');
     console.log(`📊 Total tasks in database: ${result.rows[0].count}`);
     
@@ -138,7 +137,6 @@ app.listen(port, async () => {
   console.log(`📝 API URL: http://localhost:${port}/api/tasks`);
   console.log(`💚 Health check: http://localhost:${port}/health`);
   
-  // Create table when server starts
   await createTable();
 });
 
@@ -150,3 +148,5 @@ process.on('SIGTERM', () => {
     process.exit(0);
   });
 });
+
+module.exports = app;
