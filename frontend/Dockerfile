@@ -12,6 +12,10 @@ RUN npm install
 # Copy source code
 COPY frontend/ ./
 
+# Accept build argument and set as env variable
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
+
 # Build the application
 RUN npm run build
 
