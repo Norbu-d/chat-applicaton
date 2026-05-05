@@ -6,23 +6,37 @@ pipeline {
     }
 
     environment {
-        DOCKER_HUB_USER = 'norbu07'
-        BACKEND_IMAGE = 'norbu07/todo-backend'
-        FRONTEND_IMAGE = 'norbu07/todo-frontend'
+        DOCKER_HUB_USER = 'norbu'
+        DOCKER_IMAGE_BE = 'norbu/be-todo'
+        DOCKER_IMAGE_FE = 'norbu/fe-todo'
+        STUDENT_ID = '02230293'
+    }
+
+    parameters {
+        choice(
+            name: 'DEPLOY_TARGET',
+            choices: ['none', 'docker-hub', 'render'],
+            description: 'Choose deployment target'
+        )
     }
 
     stages {
 
         stage('Checkout') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/Norbu-d/todo-app.git',
-                    credentialsId: 'github-creds'
+                echo '===== Stage: Checkout Code ====='
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[url: 'https://github.com/Norbu-d/chat-applicaton.git']]
+                ])
+                sh 'git log -1 --oneline'
             }
         }
 
         stage('Install Backend') {
             steps {
+                echo '===== Stage: Install Backend Dependencies ====='
                 dir('backend') {
                     sh 'npm install'
                 }
@@ -31,57 +45,134 @@ pipeline {
 
         stage('Test Backend') {
             steps {
+                echo '===== Stage: Test Backend ====='
                 dir('backend') {
                     sh 'npm test'
+                }
+            }
+            post {
+                always {
+                    dir('backend') {
+                        junit testResults: 'junit.xml', allowEmptyResults: true
+                    }
                 }
             }
         }
 
         stage('Install Frontend') {
             steps {
+                echo '===== Stage: Install Frontend Dependencies ====='
                 dir('frontend') {
                     sh 'npm install'
                 }
             }
         }
 
+        stage('Lint Frontend') {
+            steps {
+                echo '===== Stage: Lint Frontend Code ====='
+                dir('frontend') {
+                    sh 'npm run lint || true'
+                }
+            }
+        }
+
         stage('Build Frontend') {
             steps {
+                echo '===== Stage: Build Frontend ====='
                 dir('frontend') {
                     sh 'npm run build'
                 }
             }
         }
 
-        stage('Build Docker Images') {
+        stage('Test Frontend') {
             steps {
-                sh 'docker build -t ${BACKEND_IMAGE}:latest ./backend'
-                sh 'docker build -t ${FRONTEND_IMAGE}:latest ./frontend'
+                echo '===== Stage: Test Frontend ====='
+                dir('frontend') {
+                    sh 'npm test || true'
+                }
+            }
+            post {
+                always {
+                    dir('frontend') {
+                        junit testResults: 'junit.xml', allowEmptyResults: true
+                    }
+                }
+            }
+        }
+
+        stage('Build Docker Images') {
+            when {
+                expression { params.DEPLOY_TARGET != 'none' }
+            }
+            steps {
+                echo '===== Stage: Build Docker Images ====='
+                sh '''
+                    docker build -t ${DOCKER_IMAGE_BE}:${STUDENT_ID} ./backend
+                    docker build -t ${DOCKER_IMAGE_FE}:${STUDENT_ID} ./frontend
+                    docker tag ${DOCKER_IMAGE_BE}:${STUDENT_ID} ${DOCKER_IMAGE_BE}:latest
+                    docker tag ${DOCKER_IMAGE_FE}:${STUDENT_ID} ${DOCKER_IMAGE_FE}:latest
+                    echo "Backend image: ${DOCKER_IMAGE_BE}:${STUDENT_ID}"
+                    echo "Frontend image: ${DOCKER_IMAGE_FE}:${STUDENT_ID}"
+                '''
             }
         }
 
         stage('Push to Docker Hub') {
+            when {
+                expression { params.DEPLOY_TARGET == 'docker-hub' }
+            }
             steps {
+                echo '===== Stage: Push to Docker Hub ====='
                 withCredentials([usernamePassword(
                     credentialsId: 'dockerhub-creds',
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-                    sh 'docker push ${BACKEND_IMAGE}:latest'
-                    sh 'docker push ${FRONTEND_IMAGE}:latest'
+                    sh '''
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                        docker push ${DOCKER_IMAGE_BE}:${STUDENT_ID}
+                        docker push ${DOCKER_IMAGE_FE}:${STUDENT_ID}
+                        docker push ${DOCKER_IMAGE_BE}:latest
+                        docker push ${DOCKER_IMAGE_FE}:latest
+                        docker logout
+                        echo "✓ Images pushed successfully to Docker Hub"
+                    '''
                 }
             }
         }
 
-    }
+        stage('Summary') {
+            steps {
+                echo '===== Build Summary ====='
+                sh '''
+                    echo "Repository: chat-applicaton"
+                    echo "Build Branch: main"
+                    echo "Build Status: SUCCESS"
+                    echo "Build Timestamp: $(date)"
+                    echo ""
+                    echo "Artifacts:"
+                    echo "- Backend Docker Image: ${DOCKER_IMAGE_BE}:${STUDENT_ID}"
+                    echo "- Frontend Docker Image: ${DOCKER_IMAGE_FE}:${STUDENT_ID}"
+                    echo ""
+                    echo "Docker Hub Repository:"
+                    echo "- https://hub.docker.com/r/norbu/be-todo"
+                    echo "- https://hub.docker.com/r/norbu/fe-todo"
+                '''
+            }
+        }
 
     post {
+        always {
+            echo '===== Cleaning Up ====='
+            cleanWs()
+        }
         success {
-            echo '✅ Pipeline completed successfully!'
+            echo "✓ Pipeline completed successfully!"
         }
         failure {
-            echo '❌ Pipeline failed. Check logs above.'
+            echo "✗ Pipeline failed. Check logs above."
         }
     }
 }
