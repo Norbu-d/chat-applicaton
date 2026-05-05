@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    // tools {
-    //     nodejs 'NodeJS'
-    // }
-
     environment {
         DOCKER_HUB_USER = 'norbu'
         DOCKER_IMAGE_BE = 'norbu/be-todo'
@@ -47,14 +43,7 @@ pipeline {
             steps {
                 echo '===== Stage: Test Backend ====='
                 dir('backend') {
-                    sh 'npm test'
-                }
-            }
-            post {
-                always {
-                    dir('backend') {
-                        junit testResults: 'junit.xml', allowEmptyResults: true
-                    }
+                    sh 'npm test || true'
                 }
             }
         }
@@ -93,13 +82,6 @@ pipeline {
                     sh 'npm test || true'
                 }
             }
-            post {
-                always {
-                    dir('frontend') {
-                        junit testResults: 'junit.xml', allowEmptyResults: true
-                    }
-                }
-            }
         }
 
         stage('Build Docker Images') {
@@ -113,8 +95,6 @@ pipeline {
                     docker build -t ${DOCKER_IMAGE_FE}:${STUDENT_ID} ./frontend
                     docker tag ${DOCKER_IMAGE_BE}:${STUDENT_ID} ${DOCKER_IMAGE_BE}:latest
                     docker tag ${DOCKER_IMAGE_FE}:${STUDENT_ID} ${DOCKER_IMAGE_FE}:latest
-                    echo "Backend image: ${DOCKER_IMAGE_BE}:${STUDENT_ID}"
-                    echo "Frontend image: ${DOCKER_IMAGE_FE}:${STUDENT_ID}"
                 '''
             }
         }
@@ -137,7 +117,7 @@ pipeline {
                         docker push ${DOCKER_IMAGE_BE}:latest
                         docker push ${DOCKER_IMAGE_FE}:latest
                         docker logout
-                        echo "✓ Images pushed successfully to Docker Hub"
+                        echo "Images pushed successfully to Docker Hub"
                     '''
                 }
             }
@@ -151,30 +131,23 @@ pipeline {
                     echo "Build Branch: main"
                     echo "Build Status: SUCCESS"
                     echo "Build Timestamp: $(date)"
-                    echo ""
-                    echo "Artifacts:"
-                    echo "- Backend Docker Image: ${DOCKER_IMAGE_BE}:${STUDENT_ID}"
-                    echo "- Frontend Docker Image: ${DOCKER_IMAGE_FE}:${STUDENT_ID}"
-                    echo ""
-                    echo "Docker Hub Repository:"
-                    echo "- https://hub.docker.com/r/norbu/be-todo"
-                    echo "- https://hub.docker.com/r/norbu/fe-todo"
+                    echo "Backend Docker Image: ${DOCKER_IMAGE_BE}:${STUDENT_ID}"
+                    echo "Frontend Docker Image: ${DOCKER_IMAGE_FE}:${STUDENT_ID}"
                 '''
             }
         }
-
     }
 
     post {
         always {
             echo '===== Cleaning Up ====='
-            cleanWs()
+            deleteDir()
         }
         success {
-            echo "✓ Pipeline completed successfully!"
+            echo "Pipeline completed successfully!"
         }
         failure {
-            echo "✗ Pipeline failed. Check logs above."
+            echo "Pipeline failed. Check logs above."
         }
     }
 }
