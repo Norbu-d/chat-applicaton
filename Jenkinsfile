@@ -1,9 +1,9 @@
 pipeline {
     agent any
 
-    tools {
-        nodejs 'NodeJS'
-    }
+    // tools {
+    //     nodejs 'NodeJS'
+    // }
 
     environment {
         DOCKER_HUB_USER = 'norbu'
