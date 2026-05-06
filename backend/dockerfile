@@ -5,13 +5,13 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Copy package.json (package-lock.json is optional)
-COPY backend/package*.json ./
+COPY package*.json ./
 
 # Install dependencies (use npm install instead of npm ci)
 RUN npm install
 
 # Copy application code
-COPY backend/ .
+COPY . .
 
 # Create a non-root user to run the app
 RUN addgroup -g 1001 -S nodejs && \
