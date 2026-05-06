@@ -1,0 +1,68 @@
+name: Build and Deploy to Docker Hub & Render
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout code
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # 2. Set up Docker Buildx (for optimized builds)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # 3. Login to DockerHub
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 4. Build and Push Backend Docker Image
+      - name: Build and Push Backend Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/be-todo:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/be-todo:${{ github.sha }}
+
+      # 5. Build and Push Frontend Docker Image
+      - name: Build and Push Frontend Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/fe-todo:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/fe-todo:${{ github.sha }}
+        continue-on-error: true
+
+      # 6. Trigger Render Deployment via Webhook
+      - name: Trigger Render Deployment
+        run: |
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "imageUrl": "${{ secrets.DOCKERHUB_USERNAME }}/be-todo:latest"
+            }'
+        if: always()
+        continue-on-error: true
+
+      # 7. Job Summary
+      - name: Job Summary
+        run: |
+          echo "## GitHub Actions Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Repository**: Norbu-d/chat-applicaton" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: main" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Backend Image**: ${{ secrets.DOCKERHUB_USERNAME }}/be-todo:latest" >> $GITHUB_STEP_SUMMARY
+          echo "- **Frontend Image**: ${{ secrets.DOCKERHUB_USERNAME }}/fe-todo:latest" >> $GITHUB_STEP_SUMMARY
+          echo "- **Timestamp**: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_STEP_SUMMARY
