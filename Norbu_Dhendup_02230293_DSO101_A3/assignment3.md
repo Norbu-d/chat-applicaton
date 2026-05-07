@@ -150,6 +150,8 @@ CMD ["nginx", "-g", "daemon off;"]
 
 ### Workflow File: `.github/workflows/deploy.yml`
 
+![Created GitHub Folder with Deploy File](../assets/assignment3/created_githubfolder_with_deployfile.png)
+
 Created the workflow file with the following structure:
 
 ```yaml
@@ -238,8 +240,12 @@ jobs:
 Added three secrets to GitHub repository under **Settings → Secrets and variables → Actions**:
 
 #### 1. DOCKERHUB_USERNAME
-- **Value:** `norbu` (your Docker Hub username)
+- **Value:** `norbu07` (your Docker Hub username)
 - **Purpose:** Identifies which Docker Hub account to push images to
+
+![Docker Username Variable](../assets/assignment3/dockerusername_variable.png)
+
+![Adding Docker in Git Variable](../assets/assignment3/AddingDocker_ingitvariable.png)
 
 #### 2. DOCKERHUB_TOKEN
 - **Value:** Generated from Docker Hub Security settings
@@ -255,6 +261,14 @@ Added three secrets to GitHub repository under **Settings → Secrets and variab
 - **How to get:**
   - Go to Render.com → Service Settings → Deploy Hook
   - Copy the generated webhook URL
+
+![Getting Deploy Hook Render](../assets/assignment3/getting_deployhook_render.png)
+
+![Getting Docker Access Token](../assets/assignment3/getting_docker_access_token.png)
+
+![Adding GitHub Actions Secrets and Variables](../assets/assignment3/adding_githubactions_secrets_and_variables.png)
+
+![Filled 3 Variables Docker Username and 2](../assets/assignment3/filled_3_variables_docker_username_and2.png)
 
 ### Security Best Practices
 ✅ Secrets are encrypted by GitHub  
@@ -319,17 +333,17 @@ After setting up all the components, the GitHub Actions workflow executes succes
 
 **Total Workflow Time:** ~5-7 minutes
 
-### Screenshot Examples
-*(To be added after running the workflow)*
+### GitHub Actions Successful Workflow
 
-1. **GitHub Actions Successful Workflow Run**
-   - Path: `assets/assignmetn2/github_actions_success.png`
+![Git Actions Success Repository](../assets/assignment3/git_actions_sucess_repository.png)
 
-2. **Docker Hub Image Push**
-   - Path: `assets/assignmetn2/dockerhub_pushed_images.png`
+![Git Actions Success Commits](../assets/assignment3/git_actionssucess_commits.png)
 
-3. **Render Deployment Status**
-   - Path: `assets/assignmetn2/render_deployment_success.png`
+![Git Actions Working 1 Success](../assets/assignment3/git_actions_working_1_sucess.png)
+
+![Git Actions Success Inside](../assets/assignment3/git_actions_sucess_inside.png)
+
+![Git Actions Loading Render Auto](../assets/assignment3/git_actions_loading_reders_auto.png)
 
 ---
 
